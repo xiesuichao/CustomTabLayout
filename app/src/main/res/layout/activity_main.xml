@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <com.example.admin.customtablayout.CustomTabLayout
+        android:id="@+id/ctl_tab"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="30dp"
+        android:background="#ffffff"
+        app:ctlTextSize="15"
+        app:ctlUnderlineWidth="20"
+        app:ctlTextColor="@color/color_gray_dark2"
+        app:ctlUnderlineColor="@color/color_blue_light"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        />
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_main"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp">
+
+    </android.support.v4.view.ViewPager>
+
+
+</LinearLayout>
