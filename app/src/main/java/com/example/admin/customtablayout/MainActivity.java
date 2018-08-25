@@ -14,7 +14,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private CustomTabLayout mTabLayout;
-    private ViewPager mMainVp;
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,41 +27,40 @@ public class MainActivity extends AppCompatActivity {
         initViewPager();
 
 
-
     }
 
-    private void initView(){
+    private void initView() {
         mTabLayout = findViewById(R.id.ctl_tab);
-        mMainVp = findViewById(R.id.vp_main);
+        mViewPager = findViewById(R.id.vp_main);
     }
 
-    private void initData(){
-        mTabLayout.setTitleArr(new String[]{"title0", "title1", "title2", "title3", "title4", "title5", "title6",
-                "title7", "title8", "title9"});
+    private void initData() {
+        //设置tab标签
+        mTabLayout.setTitleArr(new String[]{"title0", "title1", "title2", "title3",
+                "title4", "title5", "title6", "title7", "title8", "title9"});
 
+        //tab点击事件
         mTabLayout.setOnTabClickListener(new CustomTabLayout.OnTabClickListener() {
             @Override
             public void tabClick(int position, String str) {
-                PrintUtil.log("position", position);
-                PrintUtil.log("str", str);
-                mMainVp.setCurrentItem(position);
+                //与ViewPager的联动
+                mViewPager.setCurrentItem(position);
             }
         });
 
+        //如果初始下划线position不为0，则调该方法调整初始position
         mTabLayout.initUnderlinePosition(1);
-
-
     }
 
-    private void initViewPager(){
+    private void initViewPager() {
         FragmentManager manager = getSupportFragmentManager();
         List<Fragment> fragmentList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             fragmentList.add(new TestFragment());
         }
-        mMainVp.setAdapter(new MainVpAdapter(manager, fragmentList));
-        mMainVp.setOffscreenPageLimit(9);
-        mMainVp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mViewPager.setAdapter(new MainVpAdapter(manager, fragmentList));
+        mViewPager.setOffscreenPageLimit(9);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -77,10 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
-
 
 
 }
