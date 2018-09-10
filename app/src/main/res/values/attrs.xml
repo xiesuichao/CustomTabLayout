@@ -12,6 +12,7 @@
         <attr name="ctlUnderlineWidth" format="integer"/>
         <attr name="ctlUnderlineHeight" format="integer"/>
         <attr name="ctlUnderlineColor" format="color"/>
+        <attr name="ctlCheckedTextColor" format="color"/>
         <attr name="ctlUnderlineDuration" format="integer"/>
         <attr name="ctlHorizontalSpace" format="integer"/>
     </declare-styleable>

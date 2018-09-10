@@ -15,6 +15,7 @@
         app:ctlUnderlineWidth="20"
         app:ctlTextColor="@color/color_gray_dark2"
         app:ctlUnderlineColor="@color/color_blue_light"
+        app:ctlCheckedTextColor="@color/color_green_light"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         />
@@ -28,5 +29,18 @@
 
     </android.support.v4.view.ViewPager>
 
+    <Button
+        android:id="@+id/btn_text_col"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="textCol"
+        />
+
+    <Button
+        android:id="@+id/btn_line_col"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="lineCol"
+        />
 
 </LinearLayout>

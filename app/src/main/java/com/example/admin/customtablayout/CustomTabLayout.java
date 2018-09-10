@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Printer;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -33,19 +34,20 @@ public class CustomTabLayout extends HorizontalScrollView {
     private String[] mTitleArr;
     private LinearLayout mTvContainerLl;
     private View mUnderlineView;
-    private int mTextSize = 15;
-    private int mTextColor = Color.parseColor("#333333");
-    private int mTvBackground = Color.parseColor("#ffffff");
-    private int mUnderlineWidth = 20;
-    private int mUnderlineHeight = 2;
-    private int mUnderlineCol = Color.parseColor("#3F51B5");
-    private int mUnderlineDuration = 150;
-    private int mHorizontalSpace = 20;
+    private int mTextSize;
+    private int mDefaultTextColor;
+    private int mTvBackground;
+    private int mUnderlineWidth;
+    private int mUnderlineHeight;
+    private int mUnderlineCol;
+    private int mCheckedTextCol;
+    private int mUnderlineDuration;
+    private int mHorizontalSpace;
     private int initPosition = 0;
     private int currentPosition = initPosition;
     private final String TEXT_STYLE_NORMAL = "0";
     private final String TEXT_STYLE_BOLD = "1";
-    private String mTextStyle = TEXT_STYLE_NORMAL;
+    private String mTextStyle;
     private OnTabClickListener mTabClickListener;
 
     public CustomTabLayout(Context context) {
@@ -79,13 +81,7 @@ public class CustomTabLayout extends HorizontalScrollView {
         }
         this.initPosition = position;
         this.currentPosition = position;
-        for (int i = 0; i < mTvContainerLl.getChildCount(); i++) {
-            if (i == position){
-                ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mUnderlineCol);
-            }else {
-                ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mTextColor);
-            }
-        }
+        resetTextColor(position);
     }
 
     /**
@@ -97,7 +93,7 @@ public class CustomTabLayout extends HorizontalScrollView {
             return;
         }
         this.currentPosition = position;
-        startAnim((TextView) mTvContainerLl.getChildAt(position));
+        startAnim(position);
     }
 
     /**
@@ -120,37 +116,96 @@ public class CustomTabLayout extends HorizontalScrollView {
         return currentPosition;
     }
 
-    private void startAnim(TextView clickTv) {
+    /**
+     * 设置下划线颜色
+     * @param colorId
+     */
+    public void setUnderlineColor(int colorId){
+        this.mUnderlineCol = colorId;
+        mUnderlineView.setBackgroundColor(mUnderlineCol);
+    }
+
+    /**
+     * 设置选中字体颜色
+     * @param colorId
+     */
+    public void setCheckedTextColor(int colorId){
+        this.mCheckedTextCol = colorId;
+        resetTextColor(currentPosition);
+    }
+
+    private void startAnim(int clickPosition) {
         TextView firstTv = (TextView) mTvContainerLl.getChildAt(initPosition);
+        TextView clickTv = (TextView)mTvContainerLl.getChildAt(clickPosition);
         float animStartX = firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 - dp2px(mUnderlineWidth) / 2;
         float clickEndX = clickTv.getLeft() + clickTv.getMeasuredWidth() / 2 - dp2px(mUnderlineWidth) / 2;
         ObjectAnimator.ofFloat(mUnderlineView, "translationX", clickEndX - animStartX)
                 .setDuration(mUnderlineDuration)
                 .start();
         for (int i = 0; i < mTvContainerLl.getChildCount(); i++) {
-            ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mTextColor);
+            ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mDefaultTextColor);
         }
-        clickTv.setTextColor(mUnderlineCol);
+        clickTv.setTextColor(mCheckedTextCol);
+        mUnderlineView.setBackgroundColor(mUnderlineCol);
     }
 
     private void init(Context context, AttributeSet attrs) {
         mContext = context;
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CustomTabLayout);
-            mTextSize = typedArray.getInt(R.styleable.CustomTabLayout_ctlTextSize, mTextSize);
-            mTextColor = typedArray.getColor(R.styleable.CustomTabLayout_ctlTextColor, mTextColor);
-            mTvBackground = typedArray.getColor(R.styleable.CustomTabLayout_ctlTvBackground, mTvBackground);
-            mUnderlineWidth = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineWidth, mUnderlineWidth);
-            mUnderlineHeight = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineHeight, mUnderlineHeight);
-            mUnderlineCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineColor, mUnderlineCol);
-            mUnderlineDuration = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineDuration, mUnderlineDuration);
-            mHorizontalSpace = typedArray.getInt(R.styleable.CustomTabLayout_ctlHorizontalSpace, mHorizontalSpace);
+            mTextSize = typedArray.getInt(R.styleable.CustomTabLayout_ctlTextSize, -1);
+            mDefaultTextColor = typedArray.getColor(R.styleable.CustomTabLayout_ctlTextColor, -1);
+            mTvBackground = typedArray.getColor(R.styleable.CustomTabLayout_ctlTvBackground, -1);
+            mUnderlineWidth = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineWidth, -1);
+            mUnderlineHeight = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineHeight, -1);
+            mUnderlineCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineColor, -1);
+            mCheckedTextCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlCheckedTextColor, -1);
+            mUnderlineDuration = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineDuration, -1);
+            mHorizontalSpace = typedArray.getInt(R.styleable.CustomTabLayout_ctlHorizontalSpace, -1);
             mTextStyle = typedArray.getString(R.styleable.CustomTabLayout_ctlTextStyle);
-            if (TextUtils.isEmpty(mTextStyle)) {
-                mTextStyle = TEXT_STYLE_NORMAL;
-            }
             typedArray.recycle();
         }
+
+        if (mTextSize == -1){
+            mTextSize = 15;
+        }
+
+        if (mDefaultTextColor == -1){
+            mDefaultTextColor = Color.parseColor("#333333");
+        }
+
+        if (mTvBackground == -1){
+            mTvBackground = Color.parseColor("#ffffff");
+        }
+
+        if (mUnderlineWidth == -1){
+            mUnderlineWidth = 20;
+        }
+
+        if (mUnderlineHeight == -1){
+            mUnderlineHeight = 2;
+        }
+
+        if (mUnderlineCol == -1){
+            mUnderlineCol = Color.parseColor("#3F51B5");
+        }
+
+        if (mCheckedTextCol == -1){
+            mCheckedTextCol = mUnderlineCol;
+        }
+
+        if (mUnderlineDuration == -1){
+            mUnderlineDuration = 150;
+        }
+
+        if (mHorizontalSpace == -1){
+            mHorizontalSpace = 20;
+        }
+
+        if (TextUtils.isEmpty(mTextStyle)){
+            mTextStyle = TEXT_STYLE_NORMAL;
+        }
+
         LayoutInflater.from(context).inflate(R.layout.common_layout_custom_tab, this, true);
         mTvContainerLl = findViewById(R.id.ll_text_view_container);
         mUnderlineView = findViewById(R.id.view_underline);
@@ -182,9 +237,9 @@ public class CustomTabLayout extends HorizontalScrollView {
             final TextView textView = new TextView(mContext);
             textView.setText(mTitleArr[i]);
             if (i == initPosition){
-                textView.setTextColor(mUnderlineCol);
+                textView.setTextColor(mCheckedTextCol);
             }else {
-                textView.setTextColor(mTextColor);
+                textView.setTextColor(mDefaultTextColor);
             }
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
             textView.setGravity(Gravity.CENTER);
@@ -217,15 +272,24 @@ public class CustomTabLayout extends HorizontalScrollView {
                 @Override
                 public void onClick(View v) {
                     currentPosition = mStrList.indexOf(title);
-                    startAnim((TextView) v);
                     if (mTabClickListener != null){
                         mTabClickListener.tabClick(currentPosition, title);
                     }
+                    startAnim(currentPosition);
                 }
             });
-
         }
-
     }
+
+    private void resetTextColor(int position){
+        for (int i = 0; i < mTvContainerLl.getChildCount(); i++) {
+            if (i == position){
+                ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mCheckedTextCol);
+            }else {
+                ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mDefaultTextColor);
+            }
+        }
+    }
+    
 
 }
