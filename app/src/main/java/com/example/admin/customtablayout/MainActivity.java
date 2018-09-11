@@ -72,11 +72,11 @@ public class MainActivity extends AppCompatActivity {
             public void tabClick(int position, String str) {
                 //与ViewPager的联动
                 mViewPager.setCurrentItem(position);
-                /*if (position == 0){
+                if (position == 0){
                     mTabLayout.setUnderlineColor(getResources().getColor(R.color.color_blue_light));
                 }else if (position == 1){
                     mTabLayout.setUnderlineColor(getResources().getColor(R.color.color_red_light));
-                }*/
+                }
             }
         });
 

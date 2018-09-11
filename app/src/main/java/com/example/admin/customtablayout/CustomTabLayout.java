@@ -49,6 +49,7 @@ public class CustomTabLayout extends HorizontalScrollView {
     private final String TEXT_STYLE_BOLD = "1";
     private String mTextStyle;
     private OnTabClickListener mTabClickListener;
+    private boolean isCheckedTextSet = false;
 
     public CustomTabLayout(Context context) {
         this(context, null);
@@ -123,6 +124,9 @@ public class CustomTabLayout extends HorizontalScrollView {
     public void setUnderlineColor(int colorId){
         this.mUnderlineCol = colorId;
         mUnderlineView.setBackgroundColor(mUnderlineCol);
+        if (!isCheckedTextSet){
+            mCheckedTextCol = mUnderlineCol;
+        }
     }
 
     /**
@@ -131,6 +135,7 @@ public class CustomTabLayout extends HorizontalScrollView {
      */
     public void setCheckedTextColor(int colorId){
         this.mCheckedTextCol = colorId;
+        this.isCheckedTextSet = true;
         resetTextColor(currentPosition);
     }
 
@@ -175,7 +180,7 @@ public class CustomTabLayout extends HorizontalScrollView {
         }
 
         if (mTvBackground == -1){
-            mTvBackground = Color.parseColor("#ffffff");
+            mTvBackground = Color.parseColor("#00000000");
         }
 
         if (mUnderlineWidth == -1){
@@ -290,6 +295,6 @@ public class CustomTabLayout extends HorizontalScrollView {
             }
         }
     }
-    
+
 
 }
