@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Printer;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,7 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,8 +29,7 @@ import java.util.List;
 public class CustomTabLayout extends HorizontalScrollView {
 
     private Context mContext;
-    private List<String> mStrList = new ArrayList<>();
-    private String[] mTitleArr;
+    private List<String> mTitleList = new ArrayList<>();
     private LinearLayout mTvContainerLl;
     private View mUnderlineView;
     private int mTextSize;
@@ -49,6 +47,7 @@ public class CustomTabLayout extends HorizontalScrollView {
     private final String TEXT_STYLE_BOLD = "1";
     private String mTextStyle;
     private OnTabClickListener mTabClickListener;
+    private OnTabScrollListener mTabScrollListener;
     private boolean isCheckedTextSet = false;
 
     public CustomTabLayout(Context context) {
@@ -68,16 +67,29 @@ public class CustomTabLayout extends HorizontalScrollView {
         void tabClick(int position, String str);
     }
 
+    /**
+     * 点击事件
+     */
     public void setOnTabClickListener(OnTabClickListener mTabClickListener) {
         this.mTabClickListener = mTabClickListener;
     }
 
+    public interface OnTabScrollListener {
+        void scrollChange(int position, String text);
+    }
+
+    /**
+     * 滑动监听
+     */
+    public void setOnTabScrollListener(OnTabScrollListener scrollListener) {
+        this.mTabScrollListener = scrollListener;
+    }
+
     /**
      * 如果初始下划线position不为0，则调该方法调整初始position
-     * @param position
      */
     public void initUnderlinePosition(int position) {
-        if (position > mTvContainerLl.getChildCount() - 1){
+        if (position > mTvContainerLl.getChildCount() - 1) {
             return;
         }
         this.initPosition = position;
@@ -87,10 +99,9 @@ public class CustomTabLayout extends HorizontalScrollView {
 
     /**
      * 移动下划线
-     * @param position
      */
     public void moveToPosition(int position) {
-        if (position < 0){
+        if (position < 0) {
             return;
         }
         this.currentPosition = position;
@@ -99,41 +110,67 @@ public class CustomTabLayout extends HorizontalScrollView {
 
     /**
      * 设置tab标签
-     * @param titleArr
      */
-    public void setTitleArr(final String[] titleArr) {
-        if (titleArr == null) {
+    public void setTitleArr(String[] titleArr) {
+        if (titleArr == null || titleArr.length == 0) {
             return;
         }
-        mTitleArr = titleArr;
+        setTitleList(Arrays.asList(titleArr));
+    }
+
+    /**
+     * 设置tab标签
+     */
+    public void setTitleList(List<String> titleList) {
+        if (titleList == null || titleList.isEmpty()) {
+            return;
+        }
+        mTitleList.clear();
+        this.mTitleList.addAll(titleList);
         setChildLayout();
     }
 
     /**
      * 获取当前下划线position
-     * @return
      */
-    public int getUnderlinePosition(){
+    public int getUnderlinePosition() {
         return currentPosition;
     }
 
     /**
-     * 设置下划线颜色
-     * @param colorId
+     * 获取titleList
      */
-    public void setUnderlineColor(int colorId){
+    public List<String> getTitleList() {
+        return mTitleList;
+    }
+
+    /**
+     * 获取当前被选中的title
+     */
+    public String getCheckedText() {
+        return mTitleList.get(currentPosition);
+    }
+
+    /**
+     * 获取当前被选中的TextView
+     */
+    public TextView getCheckedTextView() {
+        return (TextView) mTvContainerLl.getChildAt(currentPosition);
+    }
+
+    /**
+     * 设置下划线颜色
+     */
+    public void setUnderlineColor(int colorId) {
         this.mUnderlineCol = colorId;
         mUnderlineView.setBackgroundColor(mUnderlineCol);
-        if (!isCheckedTextSet){
-            mCheckedTextCol = mUnderlineCol;
-        }
+        resetTextColor(currentPosition);
     }
 
     /**
      * 设置选中字体颜色
-     * @param colorId
      */
-    public void setCheckedTextColor(int colorId){
+    public void setCheckedTextColor(int colorId) {
         this.mCheckedTextCol = colorId;
         this.isCheckedTextSet = true;
         resetTextColor(currentPosition);
@@ -141,7 +178,7 @@ public class CustomTabLayout extends HorizontalScrollView {
 
     private void startAnim(int clickPosition) {
         TextView firstTv = (TextView) mTvContainerLl.getChildAt(initPosition);
-        TextView clickTv = (TextView)mTvContainerLl.getChildAt(clickPosition);
+        TextView clickTv = (TextView) mTvContainerLl.getChildAt(clickPosition);
         float animStartX = firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 - dp2px(mUnderlineWidth) / 2;
         float clickEndX = clickTv.getLeft() + clickTv.getMeasuredWidth() / 2 - dp2px(mUnderlineWidth) / 2;
         ObjectAnimator.ofFloat(mUnderlineView, "translationX", clickEndX - animStartX)
@@ -150,8 +187,11 @@ public class CustomTabLayout extends HorizontalScrollView {
         for (int i = 0; i < mTvContainerLl.getChildCount(); i++) {
             ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mDefaultTextColor);
         }
-        clickTv.setTextColor(mCheckedTextCol);
+        clickTv.setTextColor(getCheckedTextCol());
         mUnderlineView.setBackgroundColor(mUnderlineCol);
+        if (mTabScrollListener != null) {
+            mTabScrollListener.scrollChange(clickPosition, clickTv.getText().toString());
+        }
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -171,43 +211,43 @@ public class CustomTabLayout extends HorizontalScrollView {
             typedArray.recycle();
         }
 
-        if (mTextSize == -1){
+        if (mTextSize == -1) {
             mTextSize = 15;
         }
 
-        if (mDefaultTextColor == -1){
+        if (mDefaultTextColor == -1) {
             mDefaultTextColor = Color.parseColor("#333333");
         }
 
-        if (mTvBackground == -1){
+        if (mTvBackground == -1) {
             mTvBackground = Color.parseColor("#00000000");
         }
 
-        if (mUnderlineWidth == -1){
+        if (mUnderlineWidth == -1) {
             mUnderlineWidth = 20;
         }
 
-        if (mUnderlineHeight == -1){
+        if (mUnderlineHeight == -1) {
             mUnderlineHeight = 2;
         }
 
-        if (mUnderlineCol == -1){
+        if (mUnderlineCol == -1) {
             mUnderlineCol = Color.parseColor("#3F51B5");
         }
 
-        if (mCheckedTextCol == -1){
+        if (mCheckedTextCol == -1) {
             mCheckedTextCol = mUnderlineCol;
         }
 
-        if (mUnderlineDuration == -1){
+        if (mUnderlineDuration == -1) {
             mUnderlineDuration = 150;
         }
 
-        if (mHorizontalSpace == -1){
+        if (mHorizontalSpace == -1) {
             mHorizontalSpace = 20;
         }
 
-        if (TextUtils.isEmpty(mTextStyle)){
+        if (TextUtils.isEmpty(mTextStyle)) {
             mTextStyle = TEXT_STYLE_NORMAL;
         }
 
@@ -221,11 +261,13 @@ public class CustomTabLayout extends HorizontalScrollView {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         TextView firstTv = (TextView) mTvContainerLl.getChildAt(initPosition);
+        if (firstTv == null) {
+            return;
+        }
         mUnderlineView.layout(getPaddingLeft() + firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 - dp2px(mUnderlineWidth) / 2,
                 getMeasuredHeight() - dp2px(mUnderlineHeight - getPaddingBottom()),
                 getPaddingLeft() + firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 + dp2px(mUnderlineWidth) / 2,
                 getMeasuredHeight() - getPaddingBottom());
-
     }
 
     private int dp2px(float dpValue) {
@@ -233,17 +275,15 @@ public class CustomTabLayout extends HorizontalScrollView {
         return (int) (dpValue * scale + 0.5f);
     }
 
-    private void setChildLayout(){
+    private void setChildLayout() {
         mTvContainerLl.removeAllViews();
-        Collections.addAll(mStrList, mTitleArr);
-
-        for (int i = 0; i < mTitleArr.length; i++) {
-            final String title = mTitleArr[i];
+        for (int i = 0; i < mTitleList.size(); i++) {
+            final String title = mTitleList.get(i);
             final TextView textView = new TextView(mContext);
-            textView.setText(mTitleArr[i]);
-            if (i == initPosition){
+            textView.setText(title);
+            if (i == initPosition) {
                 textView.setTextColor(mCheckedTextCol);
-            }else {
+            } else {
                 textView.setTextColor(mDefaultTextColor);
             }
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
@@ -265,9 +305,9 @@ public class CustomTabLayout extends HorizontalScrollView {
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
-            if (i == mTitleArr.length - 1){
+            if (i == mTitleList.size() - 1) {
                 params.rightMargin = 0;
-            }else {
+            } else {
                 params.rightMargin = dp2px(mHorizontalSpace);
             }
 
@@ -276,8 +316,8 @@ public class CustomTabLayout extends HorizontalScrollView {
             textView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    currentPosition = mStrList.indexOf(title);
-                    if (mTabClickListener != null){
+                    currentPosition = mTitleList.indexOf(title);
+                    if (mTabClickListener != null) {
                         mTabClickListener.tabClick(currentPosition, title);
                     }
                     startAnim(currentPosition);
@@ -286,13 +326,21 @@ public class CustomTabLayout extends HorizontalScrollView {
         }
     }
 
-    private void resetTextColor(int position){
+    private void resetTextColor(int position) {
         for (int i = 0; i < mTvContainerLl.getChildCount(); i++) {
-            if (i == position){
-                ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mCheckedTextCol);
-            }else {
+            if (i == position) {
+                ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(getCheckedTextCol());
+            } else {
                 ((TextView) mTvContainerLl.getChildAt(i)).setTextColor(mDefaultTextColor);
             }
+        }
+    }
+
+    private int getCheckedTextCol() {
+        if (!isCheckedTextSet) {
+            return mUnderlineCol;
+        } else {
+            return mCheckedTextCol;
         }
     }
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <declare-styleable name="CustomTabLayout">
         <attr name="ctlTextSize" format="integer"/>
         <attr name="ctlTextColor" format="color"/>
@@ -16,6 +15,5 @@
         <attr name="ctlUnderlineDuration" format="integer"/>
         <attr name="ctlHorizontalSpace" format="integer"/>
     </declare-styleable>
-
 
 </resources>
