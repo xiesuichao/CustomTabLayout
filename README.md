@@ -21,7 +21,7 @@
 下划线宽度，下划线高度，下划线颜色（文字选中色与下划线一致）,下划线移动时间，tab之间的水平宽度
 
 
-![image](https://github.com/xiesuichao/CustomTabLayout/raw/master/image/a2.png)
+![image](https://github.com/xiesuichao/CustomTabLayout/raw/master/image/a1.png)
 
 
      private void initData() {
