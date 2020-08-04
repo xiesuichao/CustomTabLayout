@@ -180,8 +180,8 @@ public class CustomTabLayout extends HorizontalScrollView {
     private void startAnim(int clickPosition) {
         TextView firstTv = (TextView) mTvContainerLl.getChildAt(initPosition);
         TextView clickTv = (TextView) mTvContainerLl.getChildAt(clickPosition);
-        float animStartX = firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 - dp2px(mUnderlineWidth) / 2;
-        float clickEndX = clickTv.getLeft() + clickTv.getMeasuredWidth() / 2 - dp2px(mUnderlineWidth) / 2;
+        float animStartX = firstTv.getLeft() + firstTv.getMeasuredWidth() / 2f - dp2px(mUnderlineWidth) / 2f;
+        float clickEndX = clickTv.getLeft() + clickTv.getMeasuredWidth() / 2f - dp2px(mUnderlineWidth) / 2f;
         ObjectAnimator.ofFloat(mUnderlineView, "translationX", clickEndX - animStartX)
                 .setDuration(mUnderlineDuration)
                 .start();

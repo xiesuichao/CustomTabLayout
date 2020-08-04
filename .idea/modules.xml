@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AndroidSpace-CustomTabLayout.iml" filepath="$PROJECT_DIR$/AndroidSpace-CustomTabLayout.iml" group="CustomTabLayout" />
       <module fileurl="file://$PROJECT_DIR$/CustomTabLayout.iml" filepath="$PROJECT_DIR$/CustomTabLayout.iml" group="CustomTabLayout" />
+      <module fileurl="file://$PROJECT_DIR$/app/CustomTabLayout-app.iml" filepath="$PROJECT_DIR$/app/CustomTabLayout-app.iml" group="CustomTabLayout/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="CustomTabLayout/app" />
     </modules>
   </component>
