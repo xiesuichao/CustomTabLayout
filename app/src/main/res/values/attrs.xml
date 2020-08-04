@@ -13,12 +13,17 @@
         </attr>
         <attr name="ctlUnderlineWidth" format="dimension"/>
         <attr name="ctlUnderlineHeight" format="dimension"/>
+        <attr name="ctlUnderlineMarginBottom" format="dimension"/>
         <attr name="ctlUnderlineBackground" format="reference"/>
         <attr name="ctlUnderlineColor" format="color"/>
         <attr name="ctlUnderlineDuration" format="integer"/>
         <attr name="ctlHorizontalSpace" format="dimension"/>
-        <!--是否自适应，空余间隔自动平分-->
+        <!--是否自适应，间隔自动平分-->
         <attr name="ctlAdaptive" format="boolean"/>
+        <!--title只有两个时，间隔是否全等-->
+        <attr name="ctlSpaceEqualsForTwo" format="boolean"/>
+        <!--title只有两个时，最左边和最右边是否添加间隔-->
+        <attr name="ctlAddSpaceForTwo" format="boolean"/>
     </declare-styleable>
 
 </resources>

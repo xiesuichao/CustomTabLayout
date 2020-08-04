@@ -35,7 +35,8 @@ public class CustomTabLayout extends HorizontalScrollView {
     private ImageView indicatorIv;
     private HorizontalScrollView rootHs;
     private int textSize, defaultTextColor, tvBackgroundColor, underlineWidth, underlineHeight,
-            underlineCol, checkedTextCol, underlineDuration, horizontalSpace, textPaddingLeft, textPaddingRight;
+            underlineCol, checkedTextCol, underlineDuration, horizontalSpace, textPaddingLeft,
+            textPaddingRight, underlineMarginBottom;
     private int underlineBackground;
     private int initPosition = 0;
     private int totalTextViewWidth = 0;
@@ -47,6 +48,8 @@ public class CustomTabLayout extends HorizontalScrollView {
     private OnTabScrollListener tabScrollListener;
     private boolean isCheckedTextSet = false;
     private boolean isAdaptive = false;//是否自适应, 空余间隔自动平分
+    private boolean isSpaceEqualsForTwo = false;//title只有两个时，间隔分配是否全等
+    private boolean isAddSpaceForTwo = false;//title只有两个时，最左边和最右边是否添加间隔
 
     public CustomTabLayout(Context context) {
         this(context, null);
@@ -180,14 +183,45 @@ public class CustomTabLayout extends HorizontalScrollView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (isAdaptive){
             int childCount = tvContainerLl.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) tvContainerLl.getChildAt(i).getLayoutParams();
-                if (i == titleList.size() - 1) {
-                    params.rightMargin = 0;
+            if (childCount <= 1) {
+                return;
+            }
+            int titleCount = titleList.size();
+            int totalViewWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - (textPaddingLeft + textPaddingRight) * titleCount;
+            //若title只有两个，且需要给最左边和最右边间隔，间隔自动平分需要给第一个leftMargin，和最后一个rightMargin
+            if (childCount == 2 && isAddSpaceForTwo) {
+                int space;
+                if (isSpaceEqualsForTwo) {
+                    space = (totalViewWidth - totalTextViewWidth) / 3;
                 } else {
-                    int titleCount = titleList.size();
-                    int totalViewWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - (textPaddingLeft + textPaddingRight) * titleCount;
-                    params.rightMargin = dp2px((totalViewWidth - totalTextViewWidth)/(2f * (titleList.size() - 1)));
+                    space = (totalViewWidth - totalTextViewWidth) / 4;
+                }
+                for (int i = 0; i < childCount; i++) {
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) tvContainerLl.getChildAt(i).getLayoutParams();
+                    if (isSpaceEqualsForTwo) {
+                        if (i == 0) {
+                            params.leftMargin = space;
+                            params.rightMargin = space / 2;
+                        } else {
+                            params.leftMargin = space / 2;
+                            params.rightMargin = space;
+                        }
+                    } else {
+                        params.leftMargin = space;
+                        params.rightMargin = space;
+                    }
+                }
+
+            } else {
+                //若title大于2个，最左边和最右边不给间隔，剩下的平分
+                int space = (totalViewWidth - totalTextViewWidth) / ((titleList.size() - 1));
+                for (int i = 0; i < childCount; i++) {
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) tvContainerLl.getChildAt(i).getLayoutParams();
+                    if (i == titleList.size() - 1) {
+                        params.rightMargin = 0;
+                    } else {
+                        params.rightMargin = space;
+                    }
                 }
             }
         }
@@ -201,13 +235,12 @@ public class CustomTabLayout extends HorizontalScrollView {
             return;
         }
         underlineView.layout(firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 - underlineWidth / 2,
-                getMeasuredHeight() - underlineHeight - getPaddingBottom(),
+                getMeasuredHeight() - underlineHeight - underlineMarginBottom - getPaddingBottom(),
                 firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 + underlineWidth / 2,
-                getMeasuredHeight() - getPaddingBottom());
+                getMeasuredHeight() - underlineMarginBottom - getPaddingBottom());
     }
 
     private void init(AttributeSet attrs) {
-        Print.w("init");
         if (attrs != null) {
             TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.CustomTabLayout);
             textSize = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlTvTextSize, 15);
@@ -215,15 +248,18 @@ public class CustomTabLayout extends HorizontalScrollView {
             textPaddingRight = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlTvPaddingRight, 0);
             defaultTextColor = typedArray.getColor(R.styleable.CustomTabLayout_ctlTvTextColor, 0xff333333);
             textStyle = typedArray.getString(R.styleable.CustomTabLayout_ctlTvTextStyle);
-            checkedTextCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlTvCheckedTextColor, underlineCol);
+            checkedTextCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlTvCheckedTextColor, 0xff333333);
             tvBackgroundColor = typedArray.getColor(R.styleable.CustomTabLayout_ctlTvBackgroundColor, 0x00000000);
             underlineWidth = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlUnderlineWidth, 20);
             underlineHeight = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlUnderlineHeight, 2);
+            underlineMarginBottom = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlUnderlineMarginBottom, 0);
             underlineBackground = typedArray.getResourceId(R.styleable.CustomTabLayout_ctlUnderlineBackground, -1);
             underlineCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineColor, 0xff3F51B5);
             underlineDuration = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineDuration, 150);
             horizontalSpace = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlHorizontalSpace, 20);
             isAdaptive = typedArray.getBoolean(R.styleable.CustomTabLayout_ctlAdaptive, false);
+            isSpaceEqualsForTwo = typedArray.getBoolean(R.styleable.CustomTabLayout_ctlSpaceEqualsForTwo, false);
+            isAddSpaceForTwo = typedArray.getBoolean(R.styleable.CustomTabLayout_ctlSpaceEqualsForTwo, false);
             typedArray.recycle();
         }
 
@@ -255,7 +291,7 @@ public class CustomTabLayout extends HorizontalScrollView {
         for (int i = 0; i < tvContainerLl.getChildCount(); i++) {
             ((TextView) tvContainerLl.getChildAt(i)).setTextColor(defaultTextColor);
         }
-        clickTv.setTextColor(getCheckedTextCol());
+        clickTv.setTextColor(checkedTextCol);
         if (underlineBackground == -1){
             underlineView.setBackgroundColor(underlineCol);
         }
@@ -300,7 +336,7 @@ public class CustomTabLayout extends HorizontalScrollView {
             if (i == titleList.size() - 1) {
                 params.rightMargin = 0;
             } else {
-                params.rightMargin = dp2px(horizontalSpace);
+                params.rightMargin = horizontalSpace;
             }
 
             tvContainerLl.addView(textView, params);
@@ -316,7 +352,6 @@ public class CustomTabLayout extends HorizontalScrollView {
                 }
             });
         }
-
     }
 
     private void resetTextColor(int position) {
@@ -337,8 +372,4 @@ public class CustomTabLayout extends HorizontalScrollView {
         }
     }
 
-    private int dp2px(float dpValue) {
-        float scale = getContext().getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
 }
