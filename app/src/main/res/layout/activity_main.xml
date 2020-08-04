@@ -11,15 +11,21 @@
         android:layout_height="50dp"
         android:layout_marginTop="30dp"
         android:background="#ffffff"
-        app:ctlTextSize="15"
-        app:ctlUnderlineWidth="20"
-        app:ctlTextColor="@color/color_gray_dark2"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        app:ctlTvTextSize="15sp"
+        app:ctlTvTextColor="@color/color_gray_dark2"
+        app:ctlTvCheckedTextColor="@color/color_green_light"
+        app:ctlTvPaddingLeft="20dp"
+        app:ctlTvPaddingRight="20dp"
+        app:ctlTvBackgroundColor="@color/color_red_light"
+        app:ctlUnderlineWidth="30dp"
+        app:ctlUnderlineHeight="6dp"
+        app:ctlUnderlineBackground="@drawable/indicator_info_home"
         app:ctlUnderlineColor="@color/color_blue_light"
-        app:ctlCheckedTextColor="@color/color_green_light"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
+        app:ctlAdaptive="true"
         />
-
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp_main"

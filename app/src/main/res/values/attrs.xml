@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CustomTabLayout">
-        <attr name="ctlTextSize" format="integer"/>
-        <attr name="ctlTextColor" format="color"/>
-        <attr name="ctlTvBackground" format="color"/>
-        <attr name="ctlTextStyle" format="enum">
+        <attr name="ctlTvTextSize" format="dimension"/>
+        <attr name="ctlTvTextColor" format="color"/>
+        <attr name="ctlTvPaddingLeft" format="dimension"/>
+        <attr name="ctlTvPaddingRight" format="dimension"/>
+        <attr name="ctlTvBackgroundColor" format="color"/>
+        <attr name="ctlTvCheckedTextColor" format="color"/>
+        <attr name="ctlTvTextStyle" format="enum">
             <enum name="normal" value="0"/>
             <enum name="bold" value="1"/>
         </attr>
-        <attr name="ctlUnderlineWidth" format="integer"/>
-        <attr name="ctlUnderlineHeight" format="integer"/>
+        <attr name="ctlUnderlineWidth" format="dimension"/>
+        <attr name="ctlUnderlineHeight" format="dimension"/>
+        <attr name="ctlUnderlineBackground" format="reference"/>
         <attr name="ctlUnderlineColor" format="color"/>
-        <attr name="ctlCheckedTextColor" format="color"/>
         <attr name="ctlUnderlineDuration" format="integer"/>
-        <attr name="ctlHorizontalSpace" format="integer"/>
+        <attr name="ctlHorizontalSpace" format="dimension"/>
+        <!--是否自适应，空余间隔自动平分-->
+        <attr name="ctlAdaptive" format="boolean"/>
     </declare-styleable>
 
 </resources>

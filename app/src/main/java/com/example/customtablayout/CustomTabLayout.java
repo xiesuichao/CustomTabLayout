@@ -3,7 +3,6 @@ package com.example.customtablayout;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -13,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,9 +32,13 @@ public class CustomTabLayout extends HorizontalScrollView {
     private List<String> titleList = new ArrayList<>();
     private LinearLayout tvContainerLl;
     private View underlineView;
-    private int textSize, defaultTextColor, tvBackground, underlineWidth, underlineHeight, 
-            underlineCol, checkedTextCol, underlineDuration, horizontalSpace;
+    private ImageView indicatorIv;
+    private HorizontalScrollView rootHs;
+    private int textSize, defaultTextColor, tvBackgroundColor, underlineWidth, underlineHeight,
+            underlineCol, checkedTextCol, underlineDuration, horizontalSpace, textPaddingLeft, textPaddingRight;
+    private int underlineBackground;
     private int initPosition = 0;
+    private int totalTextViewWidth = 0;
     private int currentPosition = initPosition;
     private final String TEXT_STYLE_NORMAL = "0";
     private final String TEXT_STYLE_BOLD = "1";
@@ -42,6 +46,7 @@ public class CustomTabLayout extends HorizontalScrollView {
     private OnTabClickListener tabClickListener;
     private OnTabScrollListener tabScrollListener;
     private boolean isCheckedTextSet = false;
+    private boolean isAdaptive = false;//是否自适应, 空余间隔自动平分
 
     public CustomTabLayout(Context context) {
         this(context, null);
@@ -115,6 +120,7 @@ public class CustomTabLayout extends HorizontalScrollView {
      * 设置tab标签
      */
     public void setTitleList(List<String> titleList) {
+        Print.w("setTitleList");
         if (titleList == null || titleList.isEmpty()) {
             return;
         }
@@ -169,84 +175,22 @@ public class CustomTabLayout extends HorizontalScrollView {
         resetTextColor(currentPosition);
     }
 
-    private void startAnim(int clickPosition) {
-        TextView firstTv = (TextView) tvContainerLl.getChildAt(initPosition);
-        TextView clickTv = (TextView) tvContainerLl.getChildAt(clickPosition);
-        float animStartX = firstTv.getLeft() + firstTv.getMeasuredWidth() / 2f - dp2px(underlineWidth) / 2f;
-        float clickEndX = clickTv.getLeft() + clickTv.getMeasuredWidth() / 2f - dp2px(underlineWidth) / 2f;
-        ObjectAnimator.ofFloat(underlineView, "translationX", clickEndX - animStartX)
-                .setDuration(underlineDuration)
-                .start();
-        for (int i = 0; i < tvContainerLl.getChildCount(); i++) {
-            ((TextView) tvContainerLl.getChildAt(i)).setTextColor(defaultTextColor);
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (isAdaptive){
+            int childCount = tvContainerLl.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) tvContainerLl.getChildAt(i).getLayoutParams();
+                if (i == titleList.size() - 1) {
+                    params.rightMargin = 0;
+                } else {
+                    int titleCount = titleList.size();
+                    int totalViewWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - (textPaddingLeft + textPaddingRight) * titleCount;
+                    params.rightMargin = dp2px((totalViewWidth - totalTextViewWidth)/(2f * (titleList.size() - 1)));
+                }
+            }
         }
-        clickTv.setTextColor(getCheckedTextCol());
-        underlineView.setBackgroundColor(underlineCol);
-        if (tabScrollListener != null) {
-            tabScrollListener.scrollChange(clickPosition, clickTv.getText().toString());
-        }
-    }
-
-    private void init(AttributeSet attrs) {
-        if (attrs != null) {
-            TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.CustomTabLayout);
-            textSize = typedArray.getInt(R.styleable.CustomTabLayout_ctlTextSize, -1);
-            defaultTextColor = typedArray.getColor(R.styleable.CustomTabLayout_ctlTextColor, -1);
-            tvBackground = typedArray.getColor(R.styleable.CustomTabLayout_ctlTvBackground, -1);
-            underlineWidth = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineWidth, -1);
-            underlineHeight = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineHeight, -1);
-            underlineCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineColor, -1);
-            checkedTextCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlCheckedTextColor, -1);
-            underlineDuration = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineDuration, -1);
-            horizontalSpace = typedArray.getInt(R.styleable.CustomTabLayout_ctlHorizontalSpace, -1);
-            textStyle = typedArray.getString(R.styleable.CustomTabLayout_ctlTextStyle);
-            typedArray.recycle();
-        }
-
-        if (textSize == -1) {
-            textSize = 15;
-        }
-
-        if (defaultTextColor == -1) {
-            defaultTextColor = Color.parseColor("#333333");
-        }
-
-        if (tvBackground == -1) {
-            tvBackground = Color.parseColor("#00000000");
-        }
-
-        if (underlineWidth == -1) {
-            underlineWidth = 20;
-        }
-
-        if (underlineHeight == -1) {
-            underlineHeight = 2;
-        }
-
-        if (underlineCol == -1) {
-            underlineCol = Color.parseColor("#3F51B5");
-        }
-
-        if (checkedTextCol == -1) {
-            checkedTextCol = underlineCol;
-        }
-
-        if (underlineDuration == -1) {
-            underlineDuration = 150;
-        }
-
-        if (horizontalSpace == -1) {
-            horizontalSpace = 20;
-        }
-
-        if (TextUtils.isEmpty(textStyle)) {
-            textStyle = TEXT_STYLE_NORMAL;
-        }
-
-        LayoutInflater.from(getContext()).inflate(R.layout.common_layout_custom_tab, this, true);
-        tvContainerLl = findViewById(R.id.ll_tab_container);
-        underlineView = findViewById(R.id.view_tab_underline);
-        underlineView.setBackgroundColor(underlineCol);
     }
 
     @Override
@@ -256,15 +200,68 @@ public class CustomTabLayout extends HorizontalScrollView {
         if (firstTv == null) {
             return;
         }
-        underlineView.layout(getPaddingLeft() + firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 - dp2px(underlineWidth) / 2,
-                getMeasuredHeight() - dp2px(underlineHeight - getPaddingBottom()),
-                getPaddingLeft() + firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 + dp2px(underlineWidth) / 2,
+        underlineView.layout(firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 - underlineWidth / 2,
+                getMeasuredHeight() - underlineHeight - getPaddingBottom(),
+                firstTv.getLeft() + firstTv.getMeasuredWidth() / 2 + underlineWidth / 2,
                 getMeasuredHeight() - getPaddingBottom());
     }
 
-    private int dp2px(float dpValue) {
-        float scale = getContext().getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
+    private void init(AttributeSet attrs) {
+        Print.w("init");
+        if (attrs != null) {
+            TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.CustomTabLayout);
+            textSize = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlTvTextSize, 15);
+            textPaddingLeft = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlTvPaddingLeft, 0);
+            textPaddingRight = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlTvPaddingRight, 0);
+            defaultTextColor = typedArray.getColor(R.styleable.CustomTabLayout_ctlTvTextColor, 0xff333333);
+            textStyle = typedArray.getString(R.styleable.CustomTabLayout_ctlTvTextStyle);
+            checkedTextCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlTvCheckedTextColor, underlineCol);
+            tvBackgroundColor = typedArray.getColor(R.styleable.CustomTabLayout_ctlTvBackgroundColor, 0x00000000);
+            underlineWidth = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlUnderlineWidth, 20);
+            underlineHeight = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlUnderlineHeight, 2);
+            underlineBackground = typedArray.getResourceId(R.styleable.CustomTabLayout_ctlUnderlineBackground, -1);
+            underlineCol = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineColor, 0xff3F51B5);
+            underlineDuration = typedArray.getInt(R.styleable.CustomTabLayout_ctlUnderlineDuration, 150);
+            horizontalSpace = typedArray.getDimensionPixelSize(R.styleable.CustomTabLayout_ctlHorizontalSpace, 20);
+            isAdaptive = typedArray.getBoolean(R.styleable.CustomTabLayout_ctlAdaptive, false);
+            typedArray.recycle();
+        }
+
+        LayoutInflater.from(getContext()).inflate(R.layout.layout_custom_tab, this, true);
+        tvContainerLl = findViewById(R.id.ll_tab_container);
+        underlineView = findViewById(R.id.view_tab_underline);
+        indicatorIv = findViewById(R.id.iv_tab_indicator);
+        rootHs = findViewById(R.id.hs_tab_root);
+
+        if (TextUtils.isEmpty(textStyle)) {
+            textStyle = TEXT_STYLE_NORMAL;
+        }
+
+        if (underlineBackground == -1){
+            underlineView.setBackgroundColor(underlineCol);
+        } else {
+            underlineView.setBackgroundResource(underlineBackground);
+        }
+    }
+
+    private void startAnim(int clickPosition) {
+        TextView firstTv = (TextView) tvContainerLl.getChildAt(initPosition);
+        TextView clickTv = (TextView) tvContainerLl.getChildAt(clickPosition);
+        float animStartX = firstTv.getLeft() + firstTv.getMeasuredWidth() / 2f - underlineWidth / 2f;
+        float clickEndX = clickTv.getLeft() + clickTv.getMeasuredWidth() / 2f - underlineWidth / 2f;
+        ObjectAnimator.ofFloat(underlineView, "translationX", clickEndX - animStartX)
+                .setDuration(underlineDuration)
+                .start();
+        for (int i = 0; i < tvContainerLl.getChildCount(); i++) {
+            ((TextView) tvContainerLl.getChildAt(i)).setTextColor(defaultTextColor);
+        }
+        clickTv.setTextColor(getCheckedTextCol());
+        if (underlineBackground == -1){
+            underlineView.setBackgroundColor(underlineCol);
+        }
+        if (tabScrollListener != null) {
+            tabScrollListener.scrollChange(clickPosition, clickTv.getText().toString());
+        }
     }
 
     private void setChildLayout() {
@@ -278,9 +275,10 @@ public class CustomTabLayout extends HorizontalScrollView {
             } else {
                 textView.setTextColor(defaultTextColor);
             }
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             textView.setGravity(Gravity.CENTER);
-            textView.setBackgroundColor(tvBackground);
+            textView.setBackgroundColor(tvBackgroundColor);
+            textView.setPadding(textPaddingLeft, 0, textPaddingRight, 0);
             TextPaint textPaint = textView.getPaint();
             switch (textStyle) {
                 case TEXT_STYLE_NORMAL:
@@ -294,6 +292,8 @@ public class CustomTabLayout extends HorizontalScrollView {
                 default:
                     break;
             }
+
+            totalTextViewWidth += textPaint.measureText(title);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
@@ -316,6 +316,7 @@ public class CustomTabLayout extends HorizontalScrollView {
                 }
             });
         }
+
     }
 
     private void resetTextColor(int position) {
@@ -336,5 +337,8 @@ public class CustomTabLayout extends HorizontalScrollView {
         }
     }
 
-
+    private int dp2px(float dpValue) {
+        float scale = getContext().getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
 }
