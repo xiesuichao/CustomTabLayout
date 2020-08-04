@@ -1,10 +1,9 @@
-package com.example.admin.customtablayout;
+package com.example.customtablayout;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -17,13 +16,15 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * 自定义 TabLayout
- * Created by xiesuichao on 2018/6/23.
+ * Created by darren on 2018/6/23.
  */
 
 public class CustomTabLayout extends HorizontalScrollView {

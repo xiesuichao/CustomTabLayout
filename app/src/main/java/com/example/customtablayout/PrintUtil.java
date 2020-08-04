@@ -1,10 +1,10 @@
-package com.example.admin.customtablayout;
+package com.example.customtablayout;
 
 import android.content.Context;
 import android.widget.Toast;
 
 /**
- * Created by xiesuichao on 2016/10/18.
+ * Created by darren on 2016/10/18.
  */
 public class PrintUtil {
 

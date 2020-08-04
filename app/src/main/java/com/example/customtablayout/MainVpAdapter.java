@@ -1,13 +1,14 @@
-package com.example.admin.customtablayout;
+package com.example.customtablayout;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 
 import java.util.List;
 
 /**
- * Created by xiesuichao on 2018/8/25.
+ * Created by darren on 2018/8/25.
  */
 
 public class MainVpAdapter extends FragmentPagerAdapter {

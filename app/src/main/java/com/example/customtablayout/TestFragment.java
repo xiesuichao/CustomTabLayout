@@ -1,15 +1,16 @@
-package com.example.admin.customtablayout;
+package com.example.customtablayout;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 /**
- * Created by xiesuichao on 2018/8/25.
+ * Created by darren on 2018/8/25.
  */
 
 public class TestFragment extends Fragment {

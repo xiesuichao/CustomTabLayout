@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <com.example.admin.customtablayout.CustomTabLayout
+    <com.example.customtablayout.CustomTabLayout
         android:id="@+id/ctl_tab"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -21,13 +21,13 @@
         />
 
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp_main"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="20dp">
 
-    </android.support.v4.view.ViewPager>
+    </androidx.viewpager.widget.ViewPager>
 
     <Button
         android:id="@+id/btn_text_col"
