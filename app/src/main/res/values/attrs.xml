@@ -16,7 +16,13 @@
         <attr name="ctlUnderlineMarginBottom" format="dimension"/>
         <attr name="ctlUnderlineBackground" format="reference"/>
         <attr name="ctlUnderlineColor" format="color"/>
-        <attr name="ctlUnderlineDuration" format="integer"/>
+        <attr name="ctlIndicatorSrc" format="reference"/>
+        <attr name="ctlIndicatorPaddingLeft" format="dimension"/>
+        <attr name="ctlIndicatorPaddingTop" format="dimension"/>
+        <attr name="ctlIndicatorPaddingRight" format="dimension"/>
+        <attr name="ctlIndicatorPaddingBottom" format="dimension"/>
+        <attr name="ctlIndicatorPadding" format="dimension"/>
+        <attr name="ctlAnimDuration" format="integer"/>
         <attr name="ctlHorizontalSpace" format="dimension"/>
         <!--是否自适应，间隔自动平分-->
         <attr name="ctlAdaptive" format="boolean"/>
