@@ -1,5 +1,7 @@
 package com.example.customtablayout;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -19,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +39,7 @@ public class CustomTabLayout extends HorizontalScrollView {
     private View underlineView;
     private ImageView indicatorIv;
     private HorizontalScrollView rootHs;
+    private ViewPager hostViewPager;
     private int textSize, defaultTextColor, tvBackgroundColor, underlineWidth, underlineHeight,
             underlineCol, checkedTextCol, animDuration, horizontalSpace, textPaddingLeft,
             textPaddingRight, underlineMarginBottom, underlineBgResId, indicatorResId,
@@ -53,6 +57,7 @@ public class CustomTabLayout extends HorizontalScrollView {
     private boolean isAdaptive = false;//是否自适应, 空余间隔自动平分
     private boolean isSpaceEqualsForTwo = false;//title只有两个时，间隔分配是否全等
     private boolean isAddSpaceForTwo = false;//title只有两个时，最左边和最右边是否添加间隔
+    private boolean isFirstLayout = true;
     private Rect textRect;
 
     public CustomTabLayout(Context context) {
@@ -110,7 +115,7 @@ public class CustomTabLayout extends HorizontalScrollView {
             return;
         }
         this.currentPosition = position;
-        startAnim(position);
+//        startAnim(position);
     }
 
     /**
@@ -182,6 +187,27 @@ public class CustomTabLayout extends HorizontalScrollView {
         resetTextColor(currentPosition);
     }
 
+    public void setHostViewPager(ViewPager viewPager){
+        this.hostViewPager = viewPager;
+        this.hostViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                Print.w("position", position);
+                Print.w("positionOffset", positionOffset);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -238,34 +264,44 @@ public class CustomTabLayout extends HorizontalScrollView {
         super.onLayout(changed, l, t, r, b);
         Print.w("onLayout getMeasuredWidth", getMeasuredWidth());
         Print.w("onLayout getMeasuredHeight", getMeasuredHeight());
-        TextView firstTv = (TextView) tvContainerLl.getChildAt(initPosition);
-        if (firstTv == null) {
+        TextView currentTv = null;
+        try {
+            if (tvContainerLl.getChildCount() > initPosition){
+                currentTv = (TextView) tvContainerLl.getChildAt(initPosition);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (currentTv == null || !isFirstLayout) {
             return;
         }
-        int tvMeasuredWidth = firstTv.getMeasuredWidth();
-        int tvMeasuredHeight = firstTv.getMeasuredHeight();
+        isFirstLayout = false;
+        int tvMeasuredWidth = currentTv.getMeasuredWidth();
+        int tvMeasuredHeight = currentTv.getMeasuredHeight();
         if (indicatorResId != -1) {
-            Paint paint = firstTv.getPaint();
-            String text = firstTv.getText().toString().trim();
+            Paint paint = currentTv.getPaint();
+            String text = currentTv.getText().toString().trim();
             paint.getTextBounds(text, 0, text.length(), textRect);
             int textWidth = textRect.width();
             int textHeight = textRect.height();
             if (indicatorPadding != 0){
-                indicatorIv.layout(firstTv.getLeft() + tvMeasuredWidth / 2 - textWidth / 2 - indicatorPadding,
-                        firstTv.getTop() + tvMeasuredHeight / 2 - textHeight / 2 - indicatorPadding,
-                        firstTv.getLeft() + tvMeasuredWidth / 2 + textWidth / 2 + indicatorPadding,
-                        firstTv.getTop() + tvMeasuredHeight / 2 + textHeight / 2 + indicatorPadding);
+                indicatorIv.layout(currentTv.getLeft() + tvMeasuredWidth / 2 - textWidth / 2 - indicatorPadding,
+                        currentTv.getTop() + tvMeasuredHeight / 2 - textHeight / 2 - indicatorPadding,
+                        currentTv.getLeft() + tvMeasuredWidth / 2 + textWidth / 2 + indicatorPadding,
+                        currentTv.getTop() + tvMeasuredHeight / 2 + textHeight / 2 + indicatorPadding);
             } else {
-                indicatorIv.layout(firstTv.getLeft() + tvMeasuredWidth / 2 - textWidth / 2 - indicatorPaddingLeft,
-                        firstTv.getTop() + tvMeasuredHeight / 2 - textHeight / 2 - indicatorPaddingTop,
-                        firstTv.getLeft() + tvMeasuredWidth / 2 + textWidth / 2 + indicatorPaddingRight,
-                        firstTv.getTop() + tvMeasuredHeight / 2 + textHeight / 2 + indicatorPaddingBottom);
+                indicatorIv.layout(currentTv.getLeft() + tvMeasuredWidth / 2 - textWidth / 2 - indicatorPaddingLeft,
+                        currentTv.getTop() + tvMeasuredHeight / 2 - textHeight / 2 - indicatorPaddingTop,
+                        currentTv.getLeft() + tvMeasuredWidth / 2 + textWidth / 2 + indicatorPaddingRight,
+                        currentTv.getTop() + tvMeasuredHeight / 2 + textHeight / 2 + indicatorPaddingBottom);
             }
+            Print.w("indicatorIv.getWidth", indicatorIv.getWidth());
 
         } else {
-            underlineView.layout(firstTv.getLeft() + tvMeasuredWidth / 2 - underlineWidth / 2,
+            underlineView.layout(currentTv.getLeft() + tvMeasuredWidth / 2 - underlineWidth / 2,
                     getMeasuredHeight() - underlineHeight - underlineMarginBottom - getPaddingBottom(),
-                    firstTv.getLeft() + tvMeasuredWidth / 2 + underlineWidth / 2,
+                    currentTv.getLeft() + tvMeasuredWidth / 2 + underlineWidth / 2,
                     getMeasuredHeight() - underlineMarginBottom - getPaddingBottom());
         }
     }
@@ -322,14 +358,30 @@ public class CustomTabLayout extends HorizontalScrollView {
 
     private void startAnim(int clickPosition) {
         TextView firstTv = (TextView) tvContainerLl.getChildAt(initPosition);
-        TextView clickTv = (TextView) tvContainerLl.getChildAt(clickPosition);
+        final TextView clickTv = (TextView) tvContainerLl.getChildAt(clickPosition);
         float startX = firstTv.getLeft() + firstTv.getMeasuredWidth() / 2f - underlineWidth / 2f;
         float endX = clickTv.getLeft() + clickTv.getMeasuredWidth() / 2f - underlineWidth / 2f;
         if (indicatorResId != -1){
-            ObjectAnimator.ofFloat(indicatorIv, "translationX", endX - startX)
-                    .setDuration(animDuration)
-                    .start();
-
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(indicatorIv, "translationX", endX - startX)
+                    .setDuration(animDuration);
+            objectAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    Print.w("end");
+//                    LayoutParams layoutParams = (LayoutParams) indicatorIv.getLayoutParams();
+//                    Paint paint = clickTv.getPaint();
+//                    int textWidth = (int) paint.measureText(clickTv.getText().toString().trim());
+//                    if (indicatorPadding > 0) {
+//                        layoutParams.width = textWidth + indicatorPadding * 2;
+//                    } else {
+//                        layoutParams.width = textWidth + indicatorPaddingLeft + indicatorPaddingRight;
+//                    }
+//                    layoutParams.width = 500;
+//                    indicatorIv.setLayoutParams(layoutParams);
+                }
+            });
+            objectAnimator.start();
         } else {
             ObjectAnimator.ofFloat(underlineView, "translationX", endX - startX)
                     .setDuration(animDuration)
@@ -397,6 +449,7 @@ public class CustomTabLayout extends HorizontalScrollView {
                         tabClickListener.tabClick(currentPosition, title);
                     }
                     startAnim(currentPosition);
+//                    requestLayout();
                 }
             });
         }

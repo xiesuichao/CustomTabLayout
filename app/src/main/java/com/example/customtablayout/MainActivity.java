@@ -40,11 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         titleArr = new String[]{"title0", "title111111111",
-//                "title2", "title3",
+                "title2", "title3",
 //                "title5", "title6", "title7", "title8", "title9"
         };
         //设置tab标签
         mTabLayout.setTitleArr(titleArr);
+        mTabLayout.setHostViewPager(mViewPager);
 
         //tab点击事件
         mTabLayout.setOnTabClickListener(new CustomTabLayout.OnTabClickListener() {
