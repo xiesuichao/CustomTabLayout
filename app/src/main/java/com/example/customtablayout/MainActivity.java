@@ -13,7 +13,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private CustomTabLayout mTabLayout;
+    private CustomTabLayout tabLayout1;
+    private CustomTabLayout tabLayout2;
+    private CustomTabLayout tabLayout3;
     private ViewPager mViewPager;
     private String[] titleArr = null;
 
@@ -23,13 +25,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
-        initData();
-        initViewPager();
+        initTabLayout();
+//        initViewPager();
 
     }
 
     private void initView() {
-        mTabLayout = findViewById(R.id.ctl_tab);
+//        tabLayout1 = findViewById(R.id.ctl_tab);
+        tabLayout2 = findViewById(R.id.ctl_tab2);
+//        tabLayout3 = findViewById(R.id.ctl_tab3);
+
+
         mViewPager = findViewById(R.id.vp_main);
 
         Button textColBtn = findViewById(R.id.btn_text_col);
@@ -38,31 +44,32 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initData() {
+    private void initTabLayout() {
         titleArr = new String[]{"title0", "title111111111",
                 "title2", "title3",
 //                "title5", "title6", "title7", "title8", "title9"
         };
         //设置tab标签
-        mTabLayout.setTitleArr(titleArr);
-        mTabLayout.setHostViewPager(mViewPager);
+//        tabLayout1.setTitleArr(titleArr);
+        tabLayout2.setTitleArr(titleArr);
+//        tabLayout3.setTitleArr(titleArr);
 
-        //tab点击事件
-        mTabLayout.setOnTabClickListener(new CustomTabLayout.OnTabClickListener() {
-            @Override
-            public void tabClick(int position, String str) {
-                //与ViewPager的联动
-                mViewPager.setCurrentItem(position);
 
-            }
-        });
 
-        mTabLayout.setOnTabScrollListener(new CustomTabLayout.OnTabScrollListener() {
-            @Override
-            public void scrollChange(int position, String text) {
 
-            }
-        });
+//        tabLayout1.setHostViewPager(mViewPager);
+//
+//        //tab点击事件
+//        tabLayout1.setOnTabClickListener(new CustomTabLayout.OnTabClickListener() {
+//            @Override
+//            public void tabClick(int position, String str) {
+//                //与ViewPager的联动
+//                mViewPager.setCurrentItem(position);
+//
+//            }
+//        });
+
+
 
     }
 
@@ -82,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                mTabLayout.moveToPosition(position);
+                tabLayout1.moveToPosition(position);
             }
 
             @Override

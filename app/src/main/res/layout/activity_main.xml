@@ -5,8 +5,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
+<!--    <com.example.customtablayout.CustomTabLayout-->
+<!--        android:id="@+id/ctl_tab"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:background="#ffffff"-->
+<!--        app:ctlTvTextSize="15sp"-->
+<!--        app:ctlTvTextColor="@color/color_red_light"-->
+<!--        app:ctlTvCheckedTextColor="@color/color_green_light"-->
+<!--        app:ctlTvBackgroundColor="#eeeeee"-->
+<!--        app:ctlUnderlineWidth="30dp"-->
+<!--        app:ctlUnderlineHeight="6dp"-->
+<!--        app:ctlUnderlineMarginBottom="4dp"-->
+<!--        app:ctlUnderlineBackground="@drawable/indicator_info_home"-->
+<!--        app:ctlUnderlineColor="@color/color_blue_light"-->
+<!--        app:ctlAdaptive="true"-->
+<!--        />-->
+
     <com.example.customtablayout.CustomTabLayout
-        android:id="@+id/ctl_tab"
+        android:id="@+id/ctl_tab2"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="30dp"
@@ -14,23 +32,45 @@
         app:ctlTvTextSize="15sp"
         app:ctlTvTextColor="@color/color_red_light"
         app:ctlTvCheckedTextColor="@color/color_green_light"
-        app:ctlTvPaddingLeft="20dp"
-        app:ctlTvPaddingRight="20dp"
         app:ctlTvBackgroundColor="#eeeeee"
-        app:ctlUnderlineWidth="30dp"
-        app:ctlUnderlineHeight="6dp"
-        app:ctlUnderlineMarginBottom="4dp"
-        app:ctlUnderlineBackground="@drawable/indicator_info_home"
-        app:ctlUnderlineColor="@color/color_blue_light"
+        app:ctlTvPaddingRight="20dp"
+        app:ctlTvPaddingLeft="20dp"
         app:ctlIndicatorSrc="@drawable/corner_grey"
-        app:ctlIndicatorPaddingLeft="8dp"
+        app:ctlIndicatorPaddingLeft="15dp"
         app:ctlIndicatorPaddingTop="7dp"
-        app:ctlIndicatorPaddingRight="8dp"
+        app:ctlIndicatorPaddingRight="15dp"
         app:ctlIndicatorPaddingBottom="7dp"
+        app:ctlHorizontalSpace="60dp"
         app:ctlAdaptive="true"
-        app:ctlSpaceEqualsForTwo="true"
-        app:ctlAddSpaceForTwo="true"
         />
+
+<!--    <com.example.customtablayout.CustomTabLayout-->
+<!--        android:id="@+id/ctl_tab3"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:background="#ffffff"-->
+<!--        app:ctlTvTextSize="15sp"-->
+<!--        app:ctlTvTextColor="@color/color_red_light"-->
+<!--        app:ctlTvCheckedTextColor="@color/color_green_light"-->
+<!--        app:ctlTvBackgroundColor="#eeeeee"-->
+<!--        app:ctlUnderlineWidth="30dp"-->
+<!--        app:ctlUnderlineHeight="6dp"-->
+<!--        app:ctlUnderlineMarginBottom="4dp"-->
+<!--        app:ctlUnderlineBackground="@drawable/indicator_info_home"-->
+<!--        app:ctlUnderlineColor="@color/color_blue_light"-->
+<!--        app:ctlIndicatorSrc="@drawable/corner_grey"-->
+<!--        app:ctlIndicatorPaddingLeft="20dp"-->
+<!--        app:ctlIndicatorPaddingTop="7dp"-->
+<!--        app:ctlIndicatorPaddingRight="20dp"-->
+<!--        app:ctlIndicatorPaddingBottom="7dp"-->
+<!--        app:ctlAdaptive="true"-->
+<!--        app:ctlSpaceEqualsForTwo="true"-->
+<!--        app:ctlAddSpaceForTwo="true"-->
+<!--        />-->
+
+
+
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp_main"

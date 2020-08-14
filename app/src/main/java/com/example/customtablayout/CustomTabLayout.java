@@ -59,6 +59,8 @@ public class CustomTabLayout extends HorizontalScrollView {
     private boolean isAddSpaceForTwo = false;//title只有两个时，最左边和最右边是否添加间隔
     private boolean isFirstLayout = true;
     private Rect textRect;
+    int firstLeftSpace;
+    int lastRightSpace;
 
     public CustomTabLayout(Context context) {
         this(context, null);
@@ -246,11 +248,14 @@ public class CustomTabLayout extends HorizontalScrollView {
 
             } else {
                 //若title大于2个，最左边和最右边不给间隔，剩下的平分
-                int space = (totalViewWidth - totalTextViewWidth) / ((titleList.size() - 1));
+                int space = (totalViewWidth - totalTextViewWidth - firstLeftSpace - lastRightSpace) / ((titleList.size() - 1));
                 for (int i = 0; i < childCount; i++) {
                     LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) tvContainerLl.getChildAt(i).getLayoutParams();
-                    if (i == titleList.size() - 1) {
-                        params.rightMargin = 0;
+                    if (i == 0) {
+                        params.leftMargin = firstLeftSpace;
+                        params.rightMargin = space;
+                    } else if (i == titleList.size() - 1) {
+                        params.rightMargin = lastRightSpace;
                     } else {
                         params.rightMargin = space;
                     }
@@ -296,7 +301,6 @@ public class CustomTabLayout extends HorizontalScrollView {
                         currentTv.getLeft() + tvMeasuredWidth / 2 + textWidth / 2 + indicatorPaddingRight,
                         currentTv.getTop() + tvMeasuredHeight / 2 + textHeight / 2 + indicatorPaddingBottom);
             }
-            Print.w("indicatorIv.getWidth", indicatorIv.getWidth());
 
         } else {
             underlineView.layout(currentTv.getLeft() + tvMeasuredWidth / 2 - underlineWidth / 2,
@@ -402,6 +406,7 @@ public class CustomTabLayout extends HorizontalScrollView {
 
     private void setChildLayout() {
         tvContainerLl.removeAllViews();
+
         for (int i = 0; i < titleList.size(); i++) {
             final String title = titleList.get(i);
             final TextView textView = new TextView(getContext());
@@ -433,10 +438,51 @@ public class CustomTabLayout extends HorizontalScrollView {
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
-            if (i == titleList.size() - 1) {
-                params.rightMargin = 0;
+            if (indicatorResId == -1) {
+                if (i == titleList.size() - 1) {
+                    params.rightMargin = 0;
+                } else {
+                    params.rightMargin = horizontalSpace;
+                }
+            } else if (indicatorPadding != 0) {
+                if (i == 0) {
+                    if (textPaddingLeft < indicatorPadding) {
+                        params.leftMargin = indicatorPadding - textPaddingLeft;
+                    }
+
+                } else if (i == titleList.size() - 1) {
+                    if (textPaddingRight < indicatorPadding) {
+                        params.rightMargin = indicatorPadding - textPaddingRight;
+                    }
+                } else {
+                    params.rightMargin = horizontalSpace;
+                }
+            } else if (indicatorPaddingLeft != 0 || indicatorPaddingRight != 0) {
+                if (i == 0) {
+                    if (textPaddingLeft < indicatorPaddingLeft) {
+                        params.leftMargin = indicatorPaddingLeft - textPaddingLeft;
+                        params.rightMargin = horizontalSpace;
+                    }
+
+                } else if (i == titleList.size() - 1) {
+                    if (textPaddingRight < indicatorPaddingRight) {
+                        params.rightMargin = indicatorPaddingRight - textPaddingRight;
+                    }
+                } else {
+                    params.rightMargin = horizontalSpace;
+                }
             } else {
-                params.rightMargin = horizontalSpace;
+                if (i == titleList.size() - 1) {
+                    params.rightMargin = 0;
+                } else {
+                    params.rightMargin = horizontalSpace;
+                }
+            }
+
+            if (i == 0) {
+                firstLeftSpace = params.leftMargin;
+            } else if (i == titleList.size() - 1) {
+                lastRightSpace = params.rightMargin;
             }
 
             tvContainerLl.addView(textView, params);
@@ -449,10 +495,10 @@ public class CustomTabLayout extends HorizontalScrollView {
                         tabClickListener.tabClick(currentPosition, title);
                     }
                     startAnim(currentPosition);
-//                    requestLayout();
                 }
             });
         }
+
     }
 
     private void resetTextColor(int position) {
