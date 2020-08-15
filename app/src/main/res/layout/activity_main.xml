@@ -15,10 +15,13 @@
         app:ctlTvTextColorNormal="@color/color_red_light"
         app:ctlTvTextColorChecked="@color/color_green_light"
         app:ctlTvBackgroundColor="#eeeeee"
+        app:ctlTvPaddingLeft="5dp"
+        app:ctlTvPaddingRight="5dp"
         app:ctlUnderlineWidth="30dp"
         app:ctlUnderlineHeight="6dp"
         app:ctlUnderlineMarginBottom="4dp"
         app:ctlUnderlineBackground="@drawable/indicator_info_home"
+        app:ctlUnderlineColor="@color/colorAccent"
         app:ctlAdaptive="true"
         />
 

@@ -509,12 +509,12 @@ public class CustomTabLayout extends HorizontalScrollView {
             animatorSet.start();
 
         } else {
-            float startX = startTv.getX() + startTv.getWidth() / 2f - underlineWidth / 2f;
+            float firstX = firstTv.getX() + firstTv.getWidth() / 2f - underlineWidth / 2f;
             float endX = endTv.getX() + endTv.getWidth() / 2f - underlineWidth / 2f;
 
-            Print.w("startX", startX);
+            Print.w("startX", firstX);
             Print.w("endX", endX);
-            ObjectAnimator.ofFloat(underlineView, "translationX", startX, endX)
+            ObjectAnimator.ofFloat(underlineView, "translationX", endX - firstX)
                     .setDuration(animDuration)
                     .start();
             if (underlineBgResId == -1) {

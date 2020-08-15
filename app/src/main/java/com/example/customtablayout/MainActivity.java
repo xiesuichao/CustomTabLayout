@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTabLayout() {
-        titleArr = new String[]{"zzzzzz", "zzzzzz",
-                "zzzzzz", "zzzzzz",
+        titleArr = new String[]{"OOOOOO", "OOOOOO",
+                "OOOOOO", "OOOOOO",
 //                "title5", "title6", "title7", "title8", "title9"
         };
         //设置tab标签
