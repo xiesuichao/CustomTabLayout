@@ -2,11 +2,11 @@
 <resources>
     <declare-styleable name="CustomTabLayout">
         <attr name="ctlTvTextSize" format="dimension"/>
-        <attr name="ctlTvTextColor" format="color"/>
+        <attr name="ctlTvTextColorNormal" format="color"/>
+        <attr name="ctlTvTextColorChecked" format="color"/>
         <attr name="ctlTvPaddingLeft" format="dimension"/>
         <attr name="ctlTvPaddingRight" format="dimension"/>
         <attr name="ctlTvBackgroundColor" format="color"/>
-        <attr name="ctlTvCheckedTextColor" format="color"/>
         <attr name="ctlTvTextStyle" format="enum">
             <enum name="normal" value="0"/>
             <enum name="bold" value="1"/>
