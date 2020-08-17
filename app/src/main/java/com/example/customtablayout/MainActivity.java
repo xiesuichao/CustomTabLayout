@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initTabLayout();
-//        initViewPager();
+        initViewPager();
 
     }
 
@@ -45,16 +45,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTabLayout() {
-        titleArr = new String[]{"OOOOOO", "OOOOOO",
-                "OOOOOO", "OOOOOO",
-//                "title5", "title6", "title7", "title8", "title9"
+        titleArr = new String[]{"888888", "88888888",
+                "888888", "888888",
+                "title5", "title6", "title7", "title8", "title9"
         };
         //设置tab标签
         tabLayout1.setTitleArr(titleArr);
         tabLayout2.setTitleArr(titleArr);
         tabLayout3.setTitleArr(titleArr);
 
-
+        tabLayout2.setHostViewPager(mViewPager);
 
 
 //        tabLayout1.setHostViewPager(mViewPager);
