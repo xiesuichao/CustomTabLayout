@@ -45,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTabLayout() {
-        titleArr = new String[]{"888888", "88888888",
-                "888888", "888888",
-                "title5", "title6", "title7", "title8", "title9"
+        titleArr = new String[]{"title1", "title2",
+                "title3", "title4",
+//                "title5", "title6", "title7", "title8", "title9"
         };
         //设置tab标签
         tabLayout1.setTitleArr(titleArr);
@@ -69,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-
-
     }
 
     private void initViewPager() {
@@ -81,22 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
         mViewPager.setAdapter(new MainVpAdapter(manager, fragmentList));
         mViewPager.setOffscreenPageLimit(fragmentList.size() - 1);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                tabLayout1.moveToPosition(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
 
 

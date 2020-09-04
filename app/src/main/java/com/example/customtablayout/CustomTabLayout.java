@@ -14,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.OrientationListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
@@ -35,7 +34,7 @@ import java.util.List;
  * Created by darren on 2018/6/23.
  */
 
-public class CustomTabLayout extends HorizontalScrollView {
+public class CustomTabLayout extends HorizontalScrollView implements ViewPager.OnPageChangeListener {
 
     private List<String> titleList = new ArrayList<>();
     private LinearLayout tvContainerLl;
@@ -69,7 +68,8 @@ public class CustomTabLayout extends HorizontalScrollView {
     private final int ORIENTATION_LEFT = 0;//页面相对于中线向左滑动
     private final int ORIENTATION_RIGHT = 1;//页面相对于中线向右滑动
     private int scrollOrientation = ORIENTATION_LEFT;
-
+    private TextView scrollStartTv, scrollNextTv;
+    private float lastOffset;
 
     public CustomTabLayout(Context context) {
         this(context, null);
@@ -200,92 +200,7 @@ public class CustomTabLayout extends HorizontalScrollView {
 
     public void setHostViewPager(ViewPager viewPager){
         this.hostViewPager = viewPager;
-
-
-        this.hostViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Print.w("position", position);
-                Print.w("positionOffset", positionOffset);
-//                Print.w("positionOffsetPixels", positionOffsetPixels);
-                if (position == currentIndex){
-                    scrollOrientation = ORIENTATION_LEFT;
-                    Print.w("left");
-                } else if (position == currentIndex - 1){
-                    scrollOrientation = ORIENTATION_RIGHT;
-                    Print.w("right");
-
-                }
-                if (positionOffset == 0) {
-                    return;
-                }
-                Print.w("currentPosition", currentPosition);
-                final TextView currentTv = (TextView) tvContainerLl.getChildAt(currentPosition);
-                int startX = currentTv.getLeft();
-//                Print.w("startX", startX);
-                if (ivLeft == 0) {
-                    ivLeft = indicatorIv.getLeft();
-                }
-
-                int nextX = 0;
-                float moveX = 0f;
-                TextView nextTv = null;
-                if (scrollOrientation == ORIENTATION_LEFT){
-                    if (tvContainerLl.getChildCount() > currentPosition + 1) {
-                        nextTv = (TextView) tvContainerLl.getChildAt(currentPosition + 1);
-                    }
-                    if (nextTv != null) {
-                        nextX = nextTv.getLeft();
-//                    Print.w("nextX", nextX);
-                    }
-
-                    int diffDistance = nextX - startX;
-                    moveX = ivLeft + diffDistance * positionOffset;
-                } else if (scrollOrientation == ORIENTATION_RIGHT){
-                    if (currentPosition > 0 && tvContainerLl.getChildCount() > currentPosition - 1) {
-                        nextTv = (TextView) tvContainerLl.getChildAt(currentPosition - 1);
-                    }
-                    if (nextTv != null) {
-                        nextX = nextTv.getLeft();
-                    Print.w("nextX", nextX);
-                    }
-
-                    int diffDistance = nextX - startX;
-                    moveX = ivLeft + diffDistance * (1 - positionOffset);
-                }
-
-
-
-//                Print.w("diffDistance", diffDistance);
-//                Print.w("diffDistance * positionOffset", diffDistance * positionOffset);
-                Print.w("moveX", moveX);
-//                Print.w("indicatorIv.getLeft", indicatorIv.getLeft());
-
-                indicatorIv.layout((int) moveX, indicatorIv.getTop(), (int) moveX + indicatorIv.getWidth(), indicatorIv.getBottom());
-
-                lastPositionOffset = positionOffset;
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Print.w("onPageSelected", position);
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                Print.w("state", state);
-                if (state == 1) {
-                    currentIndex = hostViewPager.getCurrentItem();
-                    Print.w("currentIndex", currentIndex);
-                } else if (state == 0) {
-                    ivLeft = indicatorIv.getLeft();
-                    currentPosition = hostViewPager.getCurrentItem();
-                    Print.w("ivLeft", ivLeft);
-                }
-            }
-        });
+        this.hostViewPager.addOnPageChangeListener(this);
     }
 
     @Override
@@ -295,7 +210,7 @@ public class CustomTabLayout extends HorizontalScrollView {
         if (isAdaptive){
             setAdaptiveLayout(measureWidth);
         } else {
-            initTvLayout();
+            initTextViewLayout();
         }
     }
 
@@ -303,6 +218,99 @@ public class CustomTabLayout extends HorizontalScrollView {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         setIndicatorLayout();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        Print.w("position", position);
+        Print.w("positionOffset", positionOffset);
+        if (lastOffset == 0){
+            lastOffset = positionOffset;
+            Print.w("lastOffset", lastOffset);
+            return;
+        }
+//        if (lastOffset < 0.5) {
+//            scrollOrientation = ORIENTATION_LEFT;
+//            Print.w("left");
+//        } else if (lastOffset > 0.5) {
+//            scrollOrientation = ORIENTATION_RIGHT;
+//            Print.w("right");
+//        }
+//        if (position == currentIndex) {
+//            scrollOrientation = ORIENTATION_LEFT;
+//            Print.w("left");
+//        } else if (position == currentIndex - 1) {
+//            scrollOrientation = ORIENTATION_RIGHT;
+//            Print.w("right");
+//        }
+        if (positionOffset - lastOffset == 0){
+            return;
+        }
+        if (positionOffset - lastOffset > 0){
+            scrollOrientation = ORIENTATION_LEFT;
+        } else {
+            scrollOrientation = ORIENTATION_RIGHT;
+        }
+
+
+
+        if (positionOffset == 0) {
+            return;
+        }
+        Print.w("currentPosition", currentPosition);
+//        final TextView currentTv = (TextView) tvContainerLl.getChildAt(currentPosition);
+        int startX = scrollStartTv.getLeft() + scrollStartTv.getWidth() / 2;
+        if (ivLeft == 0) {
+            ivLeft = indicatorIv.getLeft();
+        }
+
+        int nextX = 0;
+        float moveX = 0f;
+        if (scrollOrientation == ORIENTATION_LEFT) {
+            if (scrollNextTv == null && tvContainerLl.getChildCount() > currentPosition + 1) {
+                scrollNextTv = (TextView) tvContainerLl.getChildAt(currentPosition + 1);
+            }
+            if (scrollNextTv != null) {
+                nextX = scrollNextTv.getLeft() + scrollNextTv.getWidth() / 2;
+            }
+            int diffDistance = nextX - startX;
+            moveX = ivLeft + diffDistance * positionOffset;
+
+        } else if (scrollOrientation == ORIENTATION_RIGHT) {
+            if (scrollNextTv == null && currentPosition > 0
+                    && tvContainerLl.getChildCount() > currentPosition - 1) {
+                scrollNextTv = (TextView) tvContainerLl.getChildAt(currentPosition - 1);
+            }
+            if (scrollNextTv != null) {
+                nextX = scrollNextTv.getLeft() + scrollNextTv.getWidth() / 2;
+            }
+            int diffDistance = nextX - startX;
+            moveX = ivLeft + diffDistance * (1 - positionOffset);
+        }
+
+        Print.w("moveX", moveX);
+        indicatorIv.layout((int) moveX, indicatorIv.getTop(), (int) moveX + indicatorIv.getWidth(), indicatorIv.getBottom());
+        lastPositionOffset = positionOffset;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        Print.w("state", state);
+        if (state == 1) {
+            lastOffset = 0;
+            scrollNextTv = null;
+            scrollStartTv = (TextView) tvContainerLl.getChildAt(currentPosition);
+            ivLeft = indicatorIv.getLeft();
+            currentIndex = hostViewPager.getCurrentItem();
+            Print.w("currentIndex", currentIndex);
+            Print.w("ivLeft", ivLeft);
+        }
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        Print.w("onPageSelected", position);
+        currentPosition = position;
     }
 
     private void init(AttributeSet attrs) {
@@ -409,7 +417,7 @@ public class CustomTabLayout extends HorizontalScrollView {
     }
 
     //设置固定间距
-    private void initTvLayout() {
+    private void initTextViewLayout() {
         int count = tvContainerLl.getChildCount();
         for (int i = 0; i < count; i++) {
             TextView textView = (TextView) tvContainerLl.getChildAt(i);
